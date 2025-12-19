@@ -229,6 +229,7 @@
           <th>Modelo</th>
           <th>Estado</th>
           <th>Laboratorio</th>
+          <!-- th.actions-eq se inserta si ROL === 'admin' -->
         </tr>
       </thead>
       <tbody></tbody>
@@ -311,7 +312,7 @@
           <th>Fecha próxima</th>
           <th>Días restantes</th>
           <th>Periodicidad (días)</th>
-          <!-- Columna acciones solo si admin -->
+          <!-- th.actions-th se inserta si ROL === 'admin' -->
         </tr>
       </thead>
       <tbody></tbody>
@@ -396,7 +397,7 @@
         (Array.isArray(labs) ? labs.map(l => `<option value="${l.id}">${l.nombre}</option>`).join('') : '');
     }
 
-    // Lista de Equipos (con filtros)
+    // Lista de Equipos (con filtros) + Acciones admin
     async function cargarEquipos() {
       const tbody = document.querySelector('#eq_table tbody');
       const msg = document.getElementById('eq_msg');
@@ -418,7 +419,23 @@
         const data = await fetchJSON('/equipos?' + params.toString());
         tbody.innerHTML = '';
         if (!Array.isArray(data)) throw new Error('Respuesta inválida (equipos)');
+
+        // Header: columna Acciones (solo admin)
+        const header = document.querySelector('#eq_table thead tr');
+        const hasActionsThEq = header.querySelector('th.actions-eq');
+        if (ROL === 'admin' && !hasActionsThEq) {
+          header.insertAdjacentHTML('beforeend', '<th class="actions-eq">Acciones</th>');
+        } else if (ROL !== 'admin' && hasActionsThEq) {
+          hasActionsThEq.remove();
+        }
+
+        const includeActionsEq = (ROL === 'admin');
         data.forEach(e => {
+          const accionesHTML = includeActionsEq
+            ? `<button class="btn-secondary btn-edit-eq" data-id="${e.id}">Editar</button>
+               <button class="btn-danger btn-del-eq" data-id="${e.id}">Eliminar</button>`
+            : '';
+          const accionesTd = includeActionsEq ? `<td>${accionesHTML}</td>` : '';
           tbody.insertAdjacentHTML('beforeend', `
             <tr>
               <td>${e.id ?? ''}</td>
@@ -428,18 +445,21 @@
               <td>${e.modelo ?? ''}</td>
               <td>${e.estado ?? ''}</td>
               <td>${e.laboratorio ?? ''}</td>
+              ${accionesTd}
             </tr>
           `);
         });
+
         if (data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7">Sin datos</td></tr>';
+          const colspan = includeActionsEq ? 8 : 7;
+          tbody.innerHTML = `<tr><td colspan="${colspan}">Sin datos</td></tr>`;
         }
       } catch (e) {
         msg.textContent = 'Error: ' + (e.payload?.error ?? e.message ?? 'desconocido');
       }
     }
 
-    // Vista de Programaciones próximas (con candado anti-doble carga)
+    // Vista de Programaciones próximas (con candado anti-doble carga) + Acciones admin
     async function cargarProximas() {
       if (loadingProx) return; // evita duplicado
       loadingProx = true;
@@ -478,7 +498,12 @@
         const includeActions = (ROL === 'admin');
         data.forEach(row => {
           const accionesHTML = includeActions
-            ? `<button class="btn-danger btn-del-prog" data-id="${row.id}">Eliminar</button>`
+            ? `<button class="btn-secondary btn-edit-prog"
+                        data-id="${row.id}"
+                        data-periodicidad="${row.periodicidad_dias}"
+                        data-fecha-proxima="${row.fecha_proxima || ''}"
+                        data-fecha-ultima="${row.fecha_ultima || ''}">Editar</button>
+               <button class="btn-danger btn-del-prog" data-id="${row.id}">Eliminar</button>`
             : '';
           const accionesTd = includeActions ? `<td>${accionesHTML}</td>` : '';
 
@@ -618,7 +643,7 @@
         }
       });
 
-      // Eliminar programación desde la tabla (solo admin)
+      // ---- ELIMINAR PROGRAMACIÓN (btn-del-prog) ----
       document.addEventListener('click', async (ev) => {
         const btn = ev.target.closest('.btn-del-prog');
         if (!btn) return;
@@ -637,6 +662,27 @@
         }
       });
 
+      // ---- ELIMINAR EQUIPO (btn-del-eq) ----
+      document.addEventListener('click', async (ev) => {
+        const btnDelEq = ev.target.closest('.btn-del-eq');
+        if (!btnDelEq) return;
+        const id = btnDelEq.getAttribute('data-id');
+        if (!id) return;
+        if (!confirm('¿Eliminar equipo ID ' + id + '?')) return;
+
+        const msg = document.getElementById('eq_msg');
+        msg.textContent = 'Eliminando...';
+        try {
+          await fetchJSON('/equipos/' + id, { method: 'DELETE' });
+          msg.textContent = 'Equipo eliminado';
+          await cargarEquipos();
+          await cargarCombosAdmin();
+        } catch (e) {
+          // Si hay referencias, el backend devolverá 409 con un mensaje sugerido
+          msg.textContent = 'Error: ' + (e.payload?.error ?? e.message ?? 'desconocido');
+        }
+      });
+
       // Logout
       document.getElementById('logout').addEventListener('click', async () => {
         try { await fetchJSON('/logout', { method: 'POST' }); } catch {}
@@ -644,13 +690,7 @@
       });
     }
 
-    // Mostrar paneles admin según rol
-    function initAdminUI(rol) {
-      toggleAdminPanels(rol);
-      if (rol === 'admin') cargarCombosAdmin();
-    }
-
-    // Helpers para modal (por si luego agregas Editar)
+    // Helpers para modal (editar programación/equipo)
     function openModal(title, bodyHTML, onSave) {
       const overlay = document.getElementById('modalOverlay');
       const titleEl = document.getElementById('modalTitle');
@@ -684,6 +724,174 @@
       });
     }
 
+    // ---- EDITAR PROGRAMACIÓN (btn-edit-prog) ----
+    document.addEventListener('click', (ev) => {
+      const btnEditProg = ev.target.closest('.btn-edit-prog');
+      if (!btnEditProg) return;
+
+      const id = btnEditProg.getAttribute('data-id');
+      const periodicidad = btnEditProg.getAttribute('data-periodicidad') || '';
+      const fechaProxima = btnEditProg.getAttribute('data-fecha-proxima') || '';
+      const fechaUltima  = btnEditProg.getAttribute('data-fecha-ultima') || '';
+
+      const bodyHTML = `
+        <div class="grid">
+          <div>
+            <label>Periodicidad (días)</label>
+            <input id="edit_periodicidad" type="number" min="1" max="365" value="${periodicidad}" />
+          </div>
+          <div>
+            <label>Fecha próxima</label>
+            <input id="edit_fecha_proxima" type="date" value="${fechaProxima}" />
+          </div>
+          <div style="grid-column: span 2;">
+            <label>Fecha última (opcional)</label>
+            <input id="edit_fecha_ultima" type="date" value="${fechaUltima}" />
+          </div>
+        </div>
+      `;
+
+      openModal('Editar programación #' + id, bodyHTML, async (msg) => {
+        const payload = {
+          periodicidad_dias: parseInt(document.getElementById('edit_periodicidad').value),
+          fecha_proxima: document.getElementById('edit_fecha_proxima').value || null,
+          fecha_ultima:  document.getElementById('edit_fecha_ultima').value || null
+        };
+        if (!payload.periodicidad_dias || !payload.fecha_proxima) {
+          throw new Error('Faltan campos obligatorios');
+        }
+        await fetchJSON('/programaciones/' + id, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        await cargarProximas();
+      });
+    });
+
+    // ---- EDITAR EQUIPO (btn-edit-eq) ----
+    document.addEventListener('click', (ev) => {
+      const btnEditEq = ev.target.closest('.btn-edit-eq');
+      if (!btnEditEq) return;
+      const id = btnEditEq.getAttribute('data-id');
+
+      // Obtenemos la fila para leer valores actuales
+      const tr = btnEditEq.closest('tr');
+      const etiqueta = tr.children[1].textContent.trim();
+      const tipo     = tr.children[2].textContent.trim();
+      const marca    = tr.children[3].textContent.trim();
+      const modelo   = tr.children[4].textContent.trim();
+      const estado   = tr.children[5].textContent.trim();
+      const laboratorioNombre = tr.children[6].textContent.trim();
+
+      const bodyHTML = `
+        <div class="grid">
+          <div>
+            <label>Etiqueta (única)</label>
+            <input id="edit_etiqueta" value="${etiqueta}" />
+          </div>
+          <div>
+            <label>Laboratorio</label>
+            <select id="edit_lab"></select>
+          </div>
+          <div>
+            <label>Tipo</label>
+            <input id="edit_tipo" value="${tipo}" />
+          </div>
+          <div>
+            <label>Marca</label>
+            <input id="edit_marca" value="${marca}" />
+          </div>
+          <div>
+            <label>Modelo</label>
+            <input id="edit_modelo" value="${modelo}" />
+          </div>
+          <div>
+            <label>Estado</label>
+            <select id="edit_estado">
+              <option ${estado==='operativo'?'selected':''}>operativo</option>
+              <option ${estado==='programado'?'selected':''}>programado</option>
+              <option ${estado==='en_mantenimiento'?'selected':''}>en_mantenimiento</option>
+              <option ${estado==='de_baja'?'selected':''}>de_baja</option>
+            </select>
+          </div>
+        </div>
+      `;
+
+      openModal('Editar equipo #' + id, bodyHTML, async (msg) => {
+        const etiqueta = document.getElementById('edit_etiqueta').value.trim();
+        const labId    = parseInt(document.getElementById('edit_lab').value);
+        const payload = {
+          etiqueta_activo: etiqueta,
+          laboratorio_id: labId,
+          tipo:  document.getElementById('edit_tipo').value.trim() || null,
+          marca: document.getElementById('edit_marca').value.trim() || null,
+          modelo:document.getElementById('edit_modelo').value.trim() || null,
+          estado:document.getElementById('edit_estado').value
+        };
+        if (!payload.etiqueta_activo || !payload.laboratorio_id) {
+          throw new Error('Faltan campos obligatorios');
+        }
+
+        await fetchJSON('/equipos/' + id, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        await cargarEquipos();
+        await cargarCombosAdmin(); // refrescar combos si estás en admin
+      });
+
+      // Cargar labs en el select del modal y seleccionar el actual
+      (async () => {
+        const labs = await fetchJSON('/laboratorios');
+        const sel = document.getElementById('edit_lab');
+        sel.innerHTML = labs.map(l => `<option value="${l.id}">${l.nombre}</option>`).join('');
+        // Selecciona el laboratorio actual de la fila (por nombre)
+        const current = labs.find(l => l.nombre === laboratorioNombre);
+        if (current) sel.value = current.id;
+      })();
+    });
+
+    // ---- ELIMINAR PROGRAMACIÓN (delegación global) ----
+    document.addEventListener('click', async (ev) => {
+      const btn = ev.target.closest('.btn-del-prog');
+      if (!btn) return;
+      const id = btn.getAttribute('data-id');
+      if (!id) return;
+      if (!confirm('¿Eliminar programación ID ' + id + '?')) return;
+
+      const msg = document.getElementById('prox_msg');
+      msg.textContent = 'Eliminando...';
+      try {
+        await fetchJSON('/programaciones/' + id, { method: 'DELETE' });
+        msg.textContent = 'Programación eliminada';
+        await cargarProximas();
+      } catch (e2) {
+        msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
+      }
+    });
+
+    // ---- ELIMINAR EQUIPO (delegación global) ----
+    document.addEventListener('click', async (ev) => {
+      const btnDelEq = ev.target.closest('.btn-del-eq');
+      if (!btnDelEq) return;
+      const id = btnDelEq.getAttribute('data-id');
+      if (!id) return;
+      if (!confirm('¿Eliminar equipo ID ' + id + '?')) return;
+
+      const msg = document.getElementById('eq_msg');
+      msg.textContent = 'Eliminando...';
+      try {
+        await fetchJSON('/equipos/' + id, { method: 'DELETE' });
+        msg.textContent = 'Equipo eliminado';
+        await cargarEquipos();
+        await cargarCombosAdmin();
+      } catch (e) {
+        msg.textContent = 'Error: ' + (e.payload?.error ?? e.message ?? 'desconocido');
+      }
+    });
+
     // Inicialización
     async function init() {
       try {
@@ -700,7 +908,10 @@
         await cargarProximas();
 
         // Rol: mostrar/ocultar paneles admin y cargar combos
-        initAdminUI(ROL);
+        toggleAdminPanels(ROL);
+        if (ROL === 'admin') {
+          await cargarCombosAdmin();
+        }
 
         // Bind de eventos (solo una vez)
         bindEventsOnce();
@@ -711,5 +922,94 @@
       }
     }
     init();
+
+    // Bind global de eventos (definido arriba)
+    function bindEventsOnce() {
+      if (eventsBound) return;
+      eventsBound = true;
+
+      // Equipos: aplicar / limpiar
+      document.getElementById('eq_aplicar').addEventListener('click', cargarEquipos);
+      document.getElementById('eq_limpiar').addEventListener('click', async () => {
+        document.getElementById('eq_lab').value = '';
+        document.getElementById('eq_estado').value = '';
+        document.getElementById('eq_tipo').value = '';
+        document.getElementById('eq_marca').value = '';
+        await cargarEquipos();
+      });
+
+      // Proximas: aplicar / limpiar
+      document.getElementById('prox_aplicar').addEventListener('click', cargarProximas);
+      document.getElementById('prox_limpiar').addEventListener('click', async () => {
+        document.getElementById('prox_lab').value = '';
+        document.getElementById('prox_hasta').value = 60;
+        document.getElementById('prox_tipo').value = '';
+        document.getElementById('prox_marca').value = '';
+        await cargarProximas();
+      });
+
+      // Crear equipo
+      document.getElementById('formEquipo').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById('msgEquipo');
+        msg.textContent = 'Creando...';
+
+        const payload = {
+          etiqueta_activo: document.getElementById('eq_etiqueta').value.trim(),
+          laboratorio_id: parseInt(document.getElementById('eq_lab_create').value),
+          tipo:  document.getElementById('eq_tipo_create').value.trim() || null,
+          marca: document.getElementById('eq_marca_create').value.trim() || null,
+          modelo: document.getElementById('eq_modelo_create').value.trim() || null,
+          estado: document.getElementById('eq_estado_create').value
+        };
+        if (!payload.etiqueta_activo || !payload.laboratorio_id) {
+          msg.textContent = 'Faltan campos obligatorios';
+          return;
+        }
+
+        try {
+          const r = await fetchJSON('/equipos', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+          });
+          msg.textContent = 'Creado (ID ' + r.id + ')';
+          await cargarEquipos();
+          await cargarCombosAdmin();
+        } catch (e2) {
+          msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
+        }
+      });
+
+      // Crear programación
+      document.getElementById('formProgramacion').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById('msgProgramacion');
+        msg.textContent = 'Creando...';
+
+        const payload = {
+          equipo_id: parseInt(document.getElementById('prog_equipo').value),
+          periodicidad_dias: parseInt(document.getElementById('prog_periodicidad').value),
+          fecha_proxima: document.getElementById('prog_fecha_proxima').value || null,
+          fecha_ultima:  document.getElementById('prog_fecha_ultima').value || null
+        };
+        if (!payload.equipo_id || !payload.periodicidad_dias || !payload.fecha_proxima) {
+          msg.textContent = 'Faltan campos obligatorios';
+          return;
+        }
+
+        try {
+          const r = await fetchJSON('/programaciones', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+          });
+          msg.textContent = 'Creada (ID ' + r.id + ')';
+          await cargarProximas();
+        } catch (e2) {
+          msg.text          msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
+        }
+      });
+    }
   </script>
 </body>
