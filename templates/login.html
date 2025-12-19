@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Login</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; }
+    form { max-width: 360px; display: grid; gap: 12px; }
+    input, button { padding: 8px; font-size: 16px; }
+    .msg { margin-top: 8px; color: #444; }
+  </style>
+</head>
+<body>
+  <h1>Iniciar sesión</h1>
+  <form id="f">
+    <input name="usuario" placeholder="Usuario" required />
+    <input name="contrasena" type="password" placeholder="Contraseña" required />
+    <button type="submit">Entrar</button>
+  </form>
+  <div class="msg" id="msg"></div>
+
+  <script>
+    const f = document.getElementById('f');
+    const msg = document.getElementById('msg');
+    f.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.textContent = 'Validando...';
+      const payload = { usuario: f.usuario.value.trim(), contrasena: f.contrasena.value };
+      try {
+        const r = await fetch('/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        const j = await r.json();
+        if (r.ok) { msg.textContent = 'Login correcto. Redirigiendo...'; setTimeout(()=>{ window.location.href='/ui'; }, 400); }
+        else { msg.textContent = 'Error: ' + (j.error || 'desconocido'); }
+      } catch(err) { msg.textContent = 'Error de red'; }
+    });
+  </script>
+</body>
+</

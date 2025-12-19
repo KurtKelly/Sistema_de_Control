@@ -1,0 +1,557 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Sistema de Control de Mantenimiento</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --primary: #2563eb;
+      --secondary: #6b7280;
+      --danger: #dc2626;
+      --border: #ddd;
+      --bg: #f7fafc;
+      --muted: #555;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 24px;
+      background: var(--bg);
+      color: #222;
+    }
+    h1 { margin: 0 0 12px; }
+    h3 { margin: 0 0 8px; }
+    .top {
+      display: flex; gap: 12px; align-items: center; margin-bottom: 16px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.04);
+    }
+    .msg { margin-top: 8px; color: var(--muted); }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px; vertical-align: middle;
+    }
+    th { background: #f3f3f3; text-align: left; }
+    .btn {
+      background: var(--primary); color: #fff; border: none;
+      border-radius: 4px; padding: 8px 12px; cursor: pointer;
+    }
+    .btn-secondary {
+      background: var(--secondary); color: #fff; border: none;
+      border-radius: 4px; padding: 8px 12px; cursor: pointer;
+    }
+    .btn-danger {
+      background: var(--danger); color: #fff; border: none;
+      border-radius: 4px; padding: 8px 12px; cursor: pointer;
+    }
+    form.grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 8px; align-items: end;
+    }
+    label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+    select, input {
+      padding: 6px; width: 100%;
+      border: 1px solid var(--border); border-radius: 4px;
+      background: #fff; font-size: 14px;
+    }
+    .actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <!-- Barra superior -->
+  <div class="top">
+    <h1 style="flex:1">Sistema de Control de Mantenimiento</h1>
+    <div id="user">Verificando sesión...</div>
+    <button id="logout" class="btn-secondary">Cerrar sesión</button>
+  </div>
+
+  <!-- Tarjeta: Equipos -->
+  <div class="card" id="panel_equipos">
+    <h3>Equipos</h3>
+    <form class="grid" id="formEq">
+      <div>
+        <label>Laboratorio</label>
+        <select id="eq_lab"><option value="">Todos</option></select>
+      </div>
+      <div>
+        <label>Estado</label>
+        <select id="eq_estado">
+          <option value="">Todos</option>
+          <option>operativo</option>
+          <option>programado</option>
+          <option>en_mantenimiento</option>
+          <option>de_baja</option>
+        </select>
+      </div>
+      <div>
+        <label>Tipo</label>
+        <input id="eq_tipo" placeholder="PC / Switch / ..." />
+      </div>
+      <div>
+        <label>Marca</label>
+        <input id="eq_marca" placeholder="Dell / Cisco / ..." />
+      </div>
+      <div class="actions" style="grid-column: span 4;">
+        <button type="button" id="eq_aplicar" class="btn">Aplicar</button>
+        <button type="button" id="eq_limpiar" class="btn-secondary">Limpiar</button>
+      </div>
+      <div id="eq_msg" class="msg" style="grid-column: span 4;"></div>
+    </form>
+
+    <table id="eq_table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Etiqueta</th>
+          <th>Tipo</th>
+          <th>Marca</th>
+          <th>Modelo</th>
+          <th>Estado</th>
+          <th>Laboratorio</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Tarjeta: Crear equipo (solo admin) -->
+  <div class="card hidden" id="admin_equipo">
+    <h3>Crear equipo</h3>
+    <form id="formEquipo" class="grid">
+      <div>
+        <label>Laboratorio</label>
+        <select id="eq_lab_create"><option value="">Seleccione</option></select>
+      </div>
+      <div>
+        <label>Etiqueta (única)</label>
+        <input id="eq_etiqueta" placeholder="PC-RED-001" />
+      </div>
+      <div>
+        <label>Tipo</label>
+        <input id="eq_tipo_create" placeholder="PC / Switch / ..." />
+      </div>
+      <div>
+        <label>Marca</label>
+        <input id="eq_marca_create" placeholder="Dell / Cisco / ..." />
+      </div>
+      <div>
+        <label>Modelo</label>
+        <input id="eq_modelo_create" placeholder="OptiPlex 7000 / ..." />
+      </div>
+      <div>
+        <label>Estado</label>
+        <select id="eq_estado_create">
+          <option>operativo</option>
+          <option>programado</option>
+          <option>en_mantenimiento</option>
+          <option>de_baja</option>
+        </select>
+      </div>
+      <div class="actions" style="grid-column: span 4;">
+        <button type="submit" class="btn">Crear equipo</button>
+        <div class="msg" id="msgEquipo"></div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tarjeta: Programaciones próximas -->
+  <div class="card" id="panel_proximas">
+    <h3>Programaciones próximas</h3>
+    <form class="grid" id="formProx">
+      <div>
+        <label>Laboratorio</label>
+        <select id="prox_lab"><option value="">Todos</option></select>
+      </div>
+      <div>
+        <label>Días hasta</label>
+        <input id="prox_hasta" type="number" min="1" max="365" value="60" />
+      </div>
+      <div>
+        <label>Tipo</label>
+        <input id="prox_tipo" placeholder="PC / Switch / ..." />
+      </div>
+      <div>
+        <label>Marca</label>
+        <input id="prox_marca" placeholder="Dell / Cisco / ..." />
+      </div>
+      <div class="actions" style="grid-column: span 4;">
+        <button type="button" id="prox_aplicar" class="btn">Actualizar</button>
+        <button type="button" id="prox_limpiar" class="btn-secondary">Limpiar</button>
+      </div>
+      <div id="prox_msg" class="msg" style="grid-column: span 4;"></div>
+    </form>
+
+    <table id="prox_table">
+      <thead>
+        <tr id="prox_header_row">
+          <th>ID</th>
+          <th>Equipo</th>
+          <th>Laboratorio</th>
+          <th>Fecha próxima</th>
+          <th>Días restantes</th>
+          <th>Periodicidad (días)</th>
+          <!-- Columna acciones solo si admin -->
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Tarjeta: Crear programación (solo admin) -->
+  <div class="card hidden" id="admin_programacion">
+    <h3>Crear programación (preventiva)</h3>
+    <form id="formProgramacion" class="grid">
+      <div>
+        <label>Equipo</label>
+        <select id="prog_equipo"><option value="">Seleccione</option></select>
+      </div>
+      <div>
+        <label>Periodicidad (días)</label>
+        <input id="prog_periodicidad" type="number" min="1" max="365" value="90" />
+      </div>
+      <div>
+        <label>Fecha próxima</label>
+        <input id="prog_fecha_proxima" type="date" />
+      </div>
+      <div>
+        <label>Fecha última (opcional)</label>
+        <input id="prog_fecha_ultima" type="date" />
+      </div>
+      <div class="actions" style="grid-column: span 4;">
+        <button type="submit" class="btn">Crear programación</button>
+        <div class="msg" id="msgProgramacion"></div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Estado global
+    let ROL = 'solo_vista';
+    let loadingProx = false;
+    let eventsBound = false;
+
+    // Utilidad: fetch JSON con manejo de errores robusto
+    async function fetchJSON(url, opts = {}) {
+      const res = await fetch(url, opts);
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(`Respuesta no válida de ${url}`);
+      }
+      if (!res.ok) {
+        const msg = data?.error ?? data?.mensaje ?? data?.db_error ?? `HTTP ${res.status}`;
+        const err = new Error(msg);
+        err.status = res.status;
+        err.payload = data;
+        throw err;
+      }
+      return data; // se espera un arreglo directamente en la mayoría de endpoints
+    }
+
+    // /me para conocer rol y usuario
+    async function me() { return fetchJSON('/me'); }
+
+    // Cargar laboratorios en un <select> dado
+    async function cargarLaboratorios(selectId) {
+      const labs = await fetchJSON('/laboratorios');
+      const el = document.getElementById(selectId);
+      const firstOpt = (selectId === 'eq_lab_create' || selectId === 'prog_equipo') ? 'Seleccione' : 'Todos';
+      el.innerHTML = `<option value="">${firstOpt}</option>` +
+        (Array.isArray(labs) ? labs.map(l => `<option value="${l.id}">${l.nombre}</option>`).join('') : '');
+    }
+
+    // Lista de Equipos (con filtros)
+    async function cargarEquipos() {
+      const tbody = document.querySelector('#eq_table tbody');
+      const msg = document.getElementById('eq_msg');
+      tbody.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
+      msg.textContent = '';
+
+      const lab = document.getElementById('eq_lab').value;
+      const estado = document.getElementById('eq_estado').value;
+      const tipo = document.getElementById('eq_tipo').value.trim();
+      const marca = document.getElementById('eq_marca').value.trim();
+
+      const params = new URLSearchParams();
+      if (lab)    params.set('laboratorio_id', lab);
+      if (estado) params.set('estado', estado);
+      if (tipo)   params.set('tipo', tipo);
+      if (marca)  params.set('marca', marca);
+
+      try {
+        const data = await fetchJSON('/equipos?' + params.toString());
+        tbody.innerHTML = '';
+        if (!Array.isArray(data)) throw new Error('Respuesta inválida (equipos)');
+        data.forEach(e => {
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr>
+              <td>${e.id ?? ''}</td>
+              <td>${e.etiqueta_activo ?? ''}</td>
+              <td>${e.tipo ?? ''}</td>
+              <td>${e.marca ?? ''}</td>
+              <td>${e.modelo ?? ''}</td>
+              <td>${e.estado ?? ''}</td>
+              <td>${e.laboratorio ?? ''}</td>
+            </tr>
+          `);
+        });
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7">Sin datos</td></tr>';
+        }
+      } catch (e) {
+        msg.textContent = 'Error: ' + (e.payload?.error ?? e.message ?? 'desconocido');
+      }
+    }
+
+    // Vista de Programaciones próximas (con candado anti-doble carga)
+    async function cargarProximas() {
+      if (loadingProx) return; // evita duplicado
+      loadingProx = true;
+
+      const tbody = document.querySelector('#prox_table tbody');
+      const msg   = document.getElementById('prox_msg');
+      tbody.innerHTML = '<tr><td colspan="6">Cargando...</td></tr>';
+      msg.textContent = '';
+
+      const lab   = document.getElementById('prox_lab').value;
+      const hasta = document.getElementById('prox_hasta').value || 60;
+      const tipo  = document.getElementById('prox_tipo').value.trim();
+      const marca = document.getElementById('prox_marca').value.trim();
+
+      const params = new URLSearchParams();
+      params.set('hasta_dias', hasta);
+      if (lab)   params.set('laboratorio_id', lab);
+      if (tipo)  params.set('tipo', tipo);
+      if (marca) params.set('marca', marca);
+
+      try {
+        const data = await fetchJSON('/programaciones/proximas?' + params.toString());
+        tbody.innerHTML = '';
+
+        if (!Array.isArray(data)) throw new Error('Respuesta inválida (programaciones próximas)');
+
+        // Si es admin, añade/elimina columna Acciones en header
+        const headerRow = document.getElementById('prox_header_row');
+        const hasActionsTh = headerRow.querySelector('th.actions-th');
+        if (ROL === 'admin' && !hasActionsTh) {
+          headerRow.insertAdjacentHTML('beforeend', '<th class="actions-th">Acciones</th>');
+        } else if (ROL !== 'admin' && hasActionsTh) {
+          hasActionsTh.remove();
+        }
+
+        const includeActions = (ROL === 'admin');
+        data.forEach(row => {
+          const accionesHTML = includeActions
+            ? `<button class="btn-danger btn-del-prog" data-id="${row.id}">Eliminar</button>`
+            : '';
+        const accionesTd = includeActions ? `<td>${accionesHTML}</td>` : '';
+
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr>
+              <td>${row.id ?? ''}</td>
+              <td>${row.etiqueta_activo ?? ''}</td>
+              <td>${row.laboratorio ?? ''}</td>
+              <td>${row.fecha_proxima ?? ''}</td>
+              <td>${row.dias_restantes ?? ''}</td>
+              <td>${row.periodicidad_dias ?? ''}</td>
+              ${accionesTd}
+            </tr>
+          `);
+        });
+
+        if (data.length === 0) {
+          const colspan = includeActions ? 7 : 6;
+          tbody.innerHTML = `<tr><td colspan="${colspan}">Sin programaciones próximas en ${hasta} días</td></tr>`;
+        }
+      } catch (e) {
+        msg.textContent = 'Error: ' + (e.payload?.error ?? e.message ?? 'desconocido');
+      } finally {
+        loadingProx = false;
+      }
+    }
+
+    // Mostrar/ocultar paneles admin según rol
+    function toggleAdminPanels(rol) {
+      const adminEquipo = document.getElementById('admin_equipo');
+      const adminProg   = document.getElementById('admin_programacion');
+      const show = (rol === 'admin');
+      adminEquipo.classList.toggle('hidden', !show);
+      adminProg.classList.toggle('hidden', !show);
+    }
+
+    // Combos para paneles admin (laboratorios / equipos)
+    async function cargarCombosAdmin() {
+      // Laboratorios para crear equipo
+      const labs = await fetchJSON('/laboratorios');
+      const labCreate = document.getElementById('eq_lab_create');
+      labCreate.innerHTML = '<option value="">Seleccione</option>' +
+        (Array.isArray(labs) ? labs.map(l => `<option value="${l.id}">${l.nombre}</option>`).join('') : '');
+
+      // Equipos para crear programación (sin filtros)
+      const equipos = await fetchJSON('/equipos');
+      const progEquipo = document.getElementById('prog_equipo');
+      progEquipo.innerHTML = '<option value="">Seleccione</option>' +
+        (Array.isArray(equipos) ? equipos.map(e => `<option value="${e.id}">${e.etiqueta_activo} (${e.laboratorio})</option>`).join('') : '');
+    }
+
+    // Bind de eventos (una sola vez)
+    function bindEventsOnce() {
+      if (eventsBound) return;
+      eventsBound = true;
+
+      // Equipos: aplicar / limpiar
+      document.getElementById('eq_aplicar').addEventListener('click', cargarEquipos);
+      document.getElementById('eq_limpiar').addEventListener('click', async () => {
+        document.getElementById('eq_lab').value = '';
+        document.getElementById('eq_estado').value = '';
+        document.getElementById('eq_tipo').value = '';
+        document.getElementById('eq_marca').value = '';
+        await cargarEquipos();
+      });
+
+      // Proximas: aplicar / limpiar
+      document.getElementById('prox_aplicar').addEventListener('click', cargarProximas);
+      document.getElementById('prox_limpiar').addEventListener('click', async () => {
+        document.getElementById('prox_lab').value = '';
+        document.getElementById('prox_hasta').value = 60;
+        document.getElementById('prox_tipo').value = '';
+        document.getElementById('prox_marca').value = '';
+        await cargarProximas();
+      });
+
+      // Crear equipo
+      document.getElementById('formEquipo').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById('msgEquipo');
+        msg.textContent = 'Creando...';
+
+        const payload = {
+          etiqueta_activo: document.getElementById('eq_etiqueta').value.trim(),
+          laboratorio_id: parseInt(document.getElementById('eq_lab_create').value),
+          tipo:  document.getElementById('eq_tipo_create').value.trim() || null,
+          marca: document.getElementById('eq_marca_create').value.trim() || null,
+          modelo: document.getElementById('eq_modelo_create').value.trim() || null,
+          estado: document.getElementById('eq_estado_create').value
+        };
+        if (!payload.etiqueta_activo || !payload.laboratorio_id) {
+          msg.textContent = 'Faltan campos obligatorios';
+          return;
+        }
+
+        try {
+          const r = await fetchJSON('/equipos', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+          });
+          msg.textContent = 'Creado (ID ' + r.id + ')';
+          await cargarEquipos();
+          await cargarCombosAdmin();
+        } catch (e2) {
+          msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
+        }
+      });
+
+      // Crear programación
+      document.getElementById('formProgramacion').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById('msgProgramacion');
+        msg.textContent = 'Creando...';
+
+        const payload = {
+          equipo_id: parseInt(document.getElementById('prog_equipo').value),
+          periodicidad_dias: parseInt(document.getElementById('prog_periodicidad').value),
+          fecha_proxima: document.getElementById('prog_fecha_proxima').value || null,
+          fecha_ultima:  document.getElementById('prog_fecha_ultima').value || null
+        };
+        if (!payload.equipo_id || !payload.periodicidad_dias || !payload.fecha_proxima) {
+          msg.textContent = 'Faltan campos obligatorios';
+          return;
+        }
+
+        try {
+          const r = await fetchJSON('/programaciones', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+          });
+          msg.textContent = 'Creada (ID ' + r.id + ')';
+          await cargarProximas(); // con candado, no se duplica
+        } catch (e2) {
+          msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
+        }
+      });
+
+      // Eliminar programación desde la tabla (solo admin)
+      document.addEventListener('click', async (ev) => {
+        const btn = ev.target.closest('.btn-del-prog');
+        if (!btn) return;
+        const id = btn.getAttribute('data-id');
+        if (!id) return;
+        if (!confirm('¿Eliminar programación ID ' + id + '?')) return;
+
+        const msg = document.getElementById('prox_msg');
+        msg.textContent = 'Eliminando...';
+        try {
+          await fetchJSON('/programaciones/' + id, { method: 'DELETE' });
+          msg.textContent = 'Programación eliminada';
+          await cargarProximas();
+        } catch (e2) {
+          msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
+        }
+      });
+
+      // Logout
+      document.getElementById('logout').addEventListener('click', async () => {
+        try { await fetchJSON('/logout', { method: 'POST' }); } catch {}
+        window.location.href = '/login-ui';
+      });
+    }
+
+    // Mostrar paneles admin según rol
+    function initAdminUI(rol) {
+      toggleAdminPanels(rol);
+      if (rol === 'admin') cargarCombosAdmin();
+    }
+
+    // Inicialización
+    async function init() {
+      try {
+        const info = await me();
+        if (!info.autenticado) { window.location.href='/login-ui'; return; }
+        ROL = info.usuario.rol || 'solo_vista';
+        document.getElementById('user').textContent =
+          `Sesión: ${info.usuario.usuario} [${ROL}]`;
+
+        // Cargar catálogos y datos
+        await cargarLaboratorios('eq_lab');
+        await cargarEquipos();
+        await cargarLaboratorios('prox_lab');
+        await cargarProximas();
+
+        // Rol: mostrar/ocultar paneles admin y cargar combos
+        initAdminUI(ROL);
+
+        // Bind de eventos (solo una vez)
+        bindEventsOnce();
+
+      } catch (e) {
+        // Si /me falló o devolvió no autenticado
+        window.location.href = '/login-ui';
+      }
+    }
+    init();
+  </script>
+</body>
