@@ -438,7 +438,7 @@ def crear_incidencia():
 # ------------------------- UI -------------------------
 @app.get("/login-ui")
 def login_ui():
-    return render_template("login.html")
+    return render_template("index.html")
 
 
 @app.get("/ui")
