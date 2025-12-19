@@ -211,6 +211,86 @@ def crear_equipo():
         conn.close()
 
 
+# app.py
+@app.put("/equipos/<int:id>")
+@require_admin
+def editar_equipo(id):
+    d = request.json or {}
+    allowed = {"etiqueta_activo","laboratorio_id","tipo","marca","modelo","estado"}
+    fields = {k: d[k] for k in d.keys() if k in allowed}
+    if not fields:
+        return json_error("Sin cambios: no se enviaron campos permitidos", 400)
+
+    conn = getConexion()
+    cur  = conn.cursor(buffered=True, dictionary=True)
+    try:
+        # Verificar existencia y etiqueta actual
+        cur.execute("SELECT id, etiqueta_activo FROM equipos WHERE id=%s", (id,))
+        eq = cur.fetchone()
+        if not eq:
+            return json_error("Equipo no encontrado", 404)
+
+        # Si se cambia etiqueta, validar uniqueness
+        if "etiqueta_activo" in fields and fields["etiqueta_activo"] != eq["etiqueta_activo"]:
+            cur_check = conn.cursor()
+            cur_check.execute("SELECT COUNT(*) FROM equipos WHERE etiqueta_activo=%s", (fields["etiqueta_activo"],))
+            (exists,) = cur_check.fetchone(); cur_check.close()
+            if exists:
+                return json_error("La etiqueta ya existe", 409)
+
+        # Armar UPDATE dinámico
+        set_parts = []
+        params = []
+        for k, v in fields.items():
+            set_parts.append(f"{k}=%s"); params.append(v)
+        params.append(id)
+
+        cur2 = conn.cursor()
+        cur2.execute(f"UPDATE equipos SET {', '.join(set_parts)} WHERE id=%s", tuple(params))
+        conn.commit()
+        return jsonify({"mensaje": "Equipo actualizado", "id": id}), 200
+    except Exception as e:
+        conn.rollback()
+        return json_error(str(e))
+    finally:
+        try: cur.close()
+        except: pass
+        conn.close()
+
+# app.py
+@app.delete("/equipos/<int:id>")
+@require_admin
+def eliminar_equipo(id):
+    conn = getConexion()
+    cur  = conn.cursor()
+    try:
+        # Verificar referencias
+        refs = 0
+        cur.execute("SELECT COUNT(*) FROM programaciones_mantenimiento WHERE equipo_id=%s", (id,))
+        refs += cur.fetchone()[0]
+        cur.execute("SELECT COUNT(*) FROM mantenimientos WHERE equipo_id=%s", (id,))
+        refs += cur.fetchone()[0]
+        cur.execute("SELECT COUNT(*) FROM incidencias WHERE equipo_id=%s", (id,))
+        refs += cur.fetchone()[0]
+
+        if refs > 0:
+            return json_error(
+                "No se puede eliminar: el equipo tiene referencias (programaciones/mantenimientos/incidencias). "
+                "Sugerencia: cambiar estado a 'de_baja'.", 409
+            )
+
+        cur.execute("DELETE FROM equipos WHERE id=%s", (id,))
+        if cur.rowcount == 0:
+            conn.rollback(); return json_error("Equipo no encontrado", 404)
+
+        conn.commit()
+        return jsonify({"mensaje":"Equipo eliminado"}), 200
+    except Exception as e:
+        conn.rollback(); return json_error(str(e))
+    finally:
+        cur.close(); conn.close()
+
+
 # ------------------------- Programaciones -------------------------
 
 
@@ -276,6 +356,45 @@ def crear_programacion():
         cur.close();
         conn.close()
 
+
+
+
+@app.put("/programaciones/<int:id>")
+@require_admin
+def editar_programacion(id):
+    d = request.json or {}
+    # Campos permitidos
+    fields = {}
+    if "periodicidad_dias" in d: fields["periodicidad_dias"] = d["periodicidad_dias"]
+    if "fecha_proxima" in d:     fields["fecha_proxima"]     = d["fecha_proxima"]
+    if "fecha_ultima" in d:      fields["fecha_ultima"]      = d["fecha_ultima"]
+    if not fields:
+        return json_error("Sin cambios: no se enviaron campos a actualizar", 400)
+
+    conn = getConexion()
+    cur  = conn.cursor()
+    try:
+        # Verificar existencia
+        cur.execute("SELECT id FROM programaciones_mantenimiento WHERE id=%s", (id,))
+        row = cur.fetchone()
+        if not row:
+            return json_error("Programación no encontrada", 404)
+
+        # Armar SET dinámico
+        set_parts = []
+        params = []
+        for k, v in fields.items():
+            set_parts.append(f"{k}=%s"); params.append(v)
+        params.append(id)
+
+        cur.execute(f"UPDATE programaciones_mantenimiento SET {', '.join(set_parts)} WHERE id=%s", tuple(params))
+        conn.commit()
+        return jsonify({"mensaje": "Programación actualizada", "id": id}), 200
+    except Exception as e:
+        conn.rollback()
+        return json_error(str(e))
+    finally:
+        cur.close();  conn.close()
 
 @app.delete("/programaciones/&lt;int:id&gt;")
 @require_admin
