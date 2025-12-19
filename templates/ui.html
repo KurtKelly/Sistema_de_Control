@@ -346,6 +346,193 @@
     </form>
   </div>
 
+  <!-- Tarjeta: Mantenimientos -->
+  <div class="card" id="panel_mantenimientos">
+    <h3>Mantenimientos</h3>
+    <form class="grid" id="formMantFilters">
+      <div>
+        <label>Equipo</label>
+        <select id="mant_equipo"><option value="">Todos</option></select>
+      </div>
+      <div>
+        <label>Estado</label>
+        <select id="mant_estado">
+          <option value="">Todos</option>
+          <option>abierto</option>
+          <option>en_proceso</option>
+          <option>cerrado</option>
+        </select>
+      </div>
+      <div>
+        <label>Tipo</label>
+        <select id="mant_tipo">
+          <option value="">Todos</option>
+          <option>preventivo</option>
+          <option>correctivo</option>
+        </select>
+      </div>
+      <div>
+        <label>Desde</label>
+        <input id="mant_desde" type="date" />
+      </div>
+      <div>
+        <label>Hasta</label>
+        <input id="mant_hasta" type="date" />
+      </div>
+      <div class="actions" style="grid-column: span 4;">
+        <button type="button" id="mant_aplicar" class="btn">Aplicar</button>
+        <button type="button" id="mant_limpiar" class="btn-secondary">Limpiar</button>
+      </div>
+      <div id="mant_msg" class="msg" style="grid-column: span 4;"></div>
+    </form>
+
+    <table id="mant_table">
+      <thead>
+        <tr id="mant_header_row">
+          <th>ID</th>
+          <th>Equipo</th>
+          <th>Tipo</th>
+          <th>Estado</th>
+          <th>Apertura</th>
+          <th>Cierre</th>
+          <th>Descripción</th>
+          <!-- Acciones admin -->
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Tarjeta: Crear mantenimiento (solo admin) -->
+  <div class="card hidden" id="admin_mantenimiento">
+    <h3>Crear mantenimiento</h3>
+    <form id="formMantCreate" class="grid">
+      <div>
+        <label>Equipo</label>
+        <select id="mant_equipo_create"><option value="">Seleccione</option></select>
+      </div>
+      <div>
+        <label>Tipo</label>
+        <select id="mant_tipo_create">
+          <option>preventivo</option>
+          <option>correctivo</option>
+        </select>
+      </div>
+      <div>
+        <label>Fecha apertura</label>
+        <input id="mant_apertura_create" type="datetime-local" />
+      </div>
+      <div>
+        <label>Fecha cierre (opcional)</label>
+        <input id="mant_cierre_create" type="datetime-local" />
+      </div>
+      <div>
+        <label>Estado</label>
+        <select id="mant_estado_create">
+          <option>abierto</option>
+          <option>en_proceso</option>
+          <option>cerrado</option>
+        </select>
+      </div>
+      <div style="grid-column: span 4;">
+        <label>Descripción</label>
+        <input id="mant_desc_create" />
+      </div>
+      <div class="actions" style="grid-column: span 4;">
+        <button type="submit" class="btn">Crear mantenimiento</button>
+        <div class="msg" id="mant_create_msg"></div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tarjeta: Incidencias -->
+  <div class="card" id="panel_incidencias">
+    <h3>Incidencias</h3>
+    <form class="grid" id="formIncFilters">
+      <div>
+        <label>Equipo</label>
+        <select id="inc_equipo"><option value="">Todos</option></select>
+      </div>
+      <div>
+        <label>Severidad</label>
+        <select id="inc_severidad">
+          <option value="">Todas</option>
+          <option>baja</option>
+          <option>media</option>
+          <option>alta</option>
+        </select>
+      </div>
+      <div>
+        <label>Mantenimiento (ID)</label>
+        <input id="inc_mant_id" type="number" min="1" />
+      </div>
+      <div>
+        <label>Desde</label>
+        <input id="inc_desde" type="date" />
+      </div>
+      <div>
+        <label>Hasta</label>
+        <input id="inc_hasta" type="date" />
+      </div>
+      <div class="actions" style="grid-column: span 4;">
+        <button type="button" id="inc_aplicar" class="btn">Aplicar</button>
+        <button type="button" id="inc_limpiar" class="btn-secondary">Limpiar</button>
+      </div>
+      <div id="inc_msg" class="msg" style="grid-column: span 4;"></div>
+    </form>
+
+    <table id="inc_table">
+      <thead>
+        <tr id="inc_header_row">
+          <th>ID</th>
+          <th>Equipo</th>
+          <th>Severidad</th>
+          <th>Fecha reporte</th>
+          <th>Descripción</th>
+          <th>Reportada por</th>
+          <th>Mantenimiento</th>
+          <!-- Acciones admin -->
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Tarjeta: Crear incidencia (solo admin) -->
+  <div class="card hidden" id="admin_incidencia">
+    <h3>Crear incidencia</h3>
+    <form id="formIncCreate" class="grid">
+      <div>
+        <label>Equipo</label>
+        <select id="inc_equipo_create"><option value="">Seleccione</option></select>
+      </div>
+      <div>
+        <label>Severidad</label>
+        <select id="inc_severidad_create">
+          <option>baja</option>
+          <option>media</option>
+          <option>alta</option>
+        </select>
+      </div>
+      <div>
+        <label>Fecha reporte</label>
+        <input id="inc_fecha_create" type="datetime-local" />
+      </div>
+      <div style="grid-column: span 4;">
+        <label>Descripción</label>
+        <input id="inc_desc_create" />
+      </div>
+      <div>
+        <label>Mantenimiento (opcional, ID)</label>
+        <input id="inc_mant_id_create" type="number" min="1" />
+      </div>
+      <div class="actions" style="grid-column: span 4;">
+        <button type="submit" class="btn">Crear incidencia</button>
+        <div class="msg" id="inc_create_msg"></div>
+      </div>
+    </form>
+  </div>
+
   <!-- Modal reutilizable embebido -->
   <div id="modalOverlay" class="modal-overlay" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -370,11 +557,8 @@
     async function fetchJSON(url, opts = {}) {
       const res = await fetch(url, opts);
       let data;
-      try {
-        data = await res.json();
-      } catch {
-        throw new Error(`Respuesta no válida de ${url}`);
-      }
+      try { data = await res.json(); }
+      catch { throw new Error(`Respuesta no válida de ${url}`); }
       if (!res.ok) {
         const msg = data?.error ?? data?.mensaje ?? data?.db_error ?? `HTTP ${res.status}`;
         const err = new Error(msg);
@@ -382,7 +566,62 @@
         err.payload = data;
         throw err;
       }
-      return data; // se espera un arreglo directamente en la mayoría de endpoints
+      return data;
+    }
+
+    // Conversión datetime-local -> MySQL DATETIME
+    function toMySQLDateTime(val) {
+      // '2025-12-19T14:30' -> '2025-12-19 14:30:00'
+      if (!val) return null;
+      return val.replace('T', ' ') + ':00';
+    }
+
+    // -------- Modal reutilizable --------
+    function openModal(title, bodyHTML, onSave) {
+      const overlay = document.getElementById('modalOverlay');
+      const titleEl = document.getElementById('modalTitle');
+      const bodyEl  = document.getElementById('modalBody');
+      const msgEl   = document.getElementById('modalMsg');
+      const btnSave = document.getElementById('modalSave');
+      const btnCancel = document.getElementById('modalCancel');
+
+      titleEl.textContent = title || 'Editar';
+      bodyEl.innerHTML = bodyHTML || '';
+      msgEl.textContent = '';
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden', 'false');
+
+      function close() {
+        overlay.classList.remove('show');
+        overlay.setAttribute('aria-hidden', 'true');
+        msgEl.textContent = '';
+        btnSave.removeEventListener('click', onSaveHandler);
+        btnCancel.removeEventListener('click', onCancelHandler);
+        document.removeEventListener('keydown', onEscHandler);
+        overlay.removeEventListener('click', onOverlayClick);
+      }
+
+      async function onSaveHandler() {
+        msgEl.textContent = 'Guardando...';
+        try {
+          await onSave(msgEl);
+          msgEl.textContent = 'Guardado correctamente';
+          setTimeout(close, 250);
+        } catch (e) {
+          msgEl.textContent = 'Error: ' + (e?.payload?.error ?? e.message ?? 'desconocido');
+        }
+      }
+      function onCancelHandler() { close(); }
+      function onEscHandler(ev) { if (ev.key === 'Escape') close(); }
+      function onOverlayClick(ev) {
+        const modal = document.querySelector('#modalOverlay .modal');
+        if (!modal.contains(ev.target)) close();
+      }
+
+      btnSave.addEventListener('click', onSaveHandler);
+      btnCancel.addEventListener('click', onCancelHandler);
+      document.addEventListener('keydown', onEscHandler);
+      overlay.addEventListener('click', onOverlayClick);
     }
 
     // /me para conocer rol y usuario
@@ -392,7 +631,8 @@
     async function cargarLaboratorios(selectId) {
       const labs = await fetchJSON('/laboratorios');
       const el = document.getElementById(selectId);
-      const firstOpt = (selectId === 'eq_lab_create' || selectId === 'prog_equipo') ? 'Seleccione' : 'Todos';
+      const firstOpt = (selectId === 'eq_lab_create')
+                        ? 'Seleccione' : 'Todos';
       el.innerHTML = `<option value="">${firstOpt}</option>` +
         (Array.isArray(labs) ? labs.map(l => `<option value="${l.id}">${l.nombre}</option>`).join('') : '');
     }
@@ -432,7 +672,7 @@
         const includeActionsEq = (ROL === 'admin');
         data.forEach(e => {
           const accionesHTML = includeActionsEq
-            ? `<button class="btn-secondary btn-edit-eq" data-id="${e.id}">Editar</button>
+            ? `<button class="btn-secondary btn-edit-eq" data-id="${e.id}" data-labid="${e.laboratorio_id}">Editar</button>
                <button class="btn-danger btn-del-eq" data-id="${e.id}">Eliminar</button>`
             : '';
           const accionesTd = includeActionsEq ? `<td>${accionesHTML}</td>` : '';
@@ -531,16 +771,157 @@
       }
     }
 
-    // Mostrar/ocultar paneles admin según rol
-    function toggleAdminPanels(rol) {
-      const adminEquipo = document.getElementById('admin_equipo');
-      const adminProg   = document.getElementById('admin_programacion');
-      const show = (rol === 'admin');
-      adminEquipo.classList.toggle('hidden', !show);
-      adminProg.classList.toggle('hidden', !show);
+    // Mantenimientos: cargar/crear/editar/eliminar
+    async function cargarMantenimientos() {
+      const tbody = document.querySelector('#mant_table tbody');
+      const msg   = document.getElementById('mant_msg');
+      tbody.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
+      msg.textContent = '';
+
+      const eq    = document.getElementById('mant_equipo').value;
+      const estado= document.getElementById('mant_estado').value;
+      const tipo  = document.getElementById('mant_tipo').value;
+      const desde = document.getElementById('mant_desde').value;
+      const hasta = document.getElementById('mant_hasta').value;
+
+      const params = new URLSearchParams();
+      if (eq)    params.set('equipo_id', eq);
+      if (estado)params.set('estado', estado);
+      if (tipo)  params.set('tipo', tipo);
+      if (desde) params.set('desde', desde);
+      if (hasta) params.set('hasta', hasta);
+
+      try {
+        const data = await fetchJSON('/mantenimientos?' + params.toString());
+        tbody.innerHTML = '';
+
+        // Header Acciones (admin)
+        const headerRow = document.getElementById('mant_header_row');
+        const hasActionsTh = headerRow.querySelector('th.actions-mant');
+        if (ROL === 'admin' && !hasActionsTh) {
+          headerRow.insertAdjacentHTML('beforeend', '<th class="actions-mant">Acciones</th>');
+        } else if (ROL !== 'admin' && hasActionsTh) {
+          hasActionsTh.remove();
+        }
+
+        const includeActions = (ROL === 'admin');
+        data.forEach(r => {
+          const accionesHTML = includeActions
+            ? `<button class="btn-secondary btn-edit-mant"
+                        data-id="${r.id}"
+                        data-equipo="${r.equipo_id}"
+                        data-tipo="${r.tipo}"
+                        data-estado="${r.estado}"
+                        data-apertura="${r.fecha_apertura || ''}"
+                        data-cierre="${r.fecha_cierre || ''}"
+                        data-desc="${(r.descripcion || '').replace(/"/g,'&quot;')}">Editar</button>
+               <button class="btn-danger btn-del-mant" data-id="${r.id}">Eliminar</button>`
+            : '';
+          const accionesTd = includeActions ? `<td>${accionesHTML}</td>` : '';
+
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr>
+              <td>${r.id}</td>
+              <td>${r.etiqueta_activo}</td>
+              <td>${r.tipo}</td>
+              <td>${r.estado}</td>
+              <td>${r.fecha_apertura || ''}</td>
+              <td>${r.fecha_cierre || ''}</td>
+              <td>${r.descripcion || ''}</td>
+              ${accionesTd}
+            </tr>
+          `);
+        });
+
+        if (data.length === 0) {
+          const colspan = includeActions ? 8 : 7;
+          tbody.innerHTML = `<tr><td colspan="${colspan}">Sin mantenimientos</td></tr>`;
+        }
+      } catch (e) {
+        msg.textContent = 'Error: ' + (e.payload?.error ?? e.message ?? 'desconocido');
+      }
     }
 
-    // Combos para paneles admin (laboratorios / equipos)
+    // Incidencias: cargar/crear/editar/eliminar
+    async function cargarIncidencias() {
+      const tbody = document.querySelector('#inc_table tbody');
+      const msg   = document.getElementById('inc_msg');
+      tbody.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
+      msg.textContent = '';
+
+      const eq     = document.getElementById('inc_equipo').value;
+      const sev    = document.getElementById('inc_severidad').value;
+      const mantId = document.getElementById('inc_mant_id').value;
+      const desde  = document.getElementById('inc_desde').value;
+      const hasta  = document.getElementById('inc_hasta').value;
+
+      const params = new URLSearchParams();
+      if (eq)     params.set('equipo_id', eq);
+      if (sev)    params.set('severidad', sev);
+      if (mantId) params.set('mantenimiento_id', mantId);
+      if (desde)  params.set('desde', desde);
+      if (hasta)  params.set('hasta', hasta);
+
+      try {
+        const data = await fetchJSON('/incidencias?' + params.toString());
+        tbody.innerHTML = '';
+
+        // Header Acciones (admin)
+        const headerRow = document.getElementById('inc_header_row');
+        const hasActionsTh = headerRow.querySelector('th.actions-inc');
+        if (ROL === 'admin' && !hasActionsTh) {
+          headerRow.insertAdjacentHTML('beforeend', '<th class="actions-inc">Acciones</th>');
+        } else if (ROL !== 'admin' && hasActionsTh) {
+          hasActionsTh.remove();
+        }
+
+        const includeActions = (ROL === 'admin');
+        data.forEach(r => {
+          const accionesHTML = includeActions
+            ? `<button class="btn-secondary btn-edit-inc"
+                        data-id="${r.id}"
+                        data-equipo="${r.equipo_id}"
+                        data-sev="${r.severidad}"
+                        data-fecha="${(r.fecha_reporte || '').replace(' ', 'T').slice(0,16)}"
+                        data-desc="${(r.descripcion || '').replace(/"/g,'&quot;')}"
+                        data-mant="${r.mantenimiento_id || ''}">Editar</button>
+               <button class="btn-danger btn-del-inc" data-id="${r.id}">Eliminar</button>`
+            : '';
+          const accionesTd = includeActions ? `<td>${accionesHTML}</td>` : '';
+
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr>
+              <td>${r.id}</td>
+              <td>${r.etiqueta_activo}</td>
+              <td>${r.severidad}</td>
+              <td>${r.fecha_reporte || ''}</td>
+              <td>${r.descripcion || ''}</td>
+              <td>${r.reportada_por_usuario || r.reportada_por || ''}</td>
+              <td>${r.mantenimiento_id || ''}</td>
+              ${accionesTd}
+            </tr>
+          `);
+        });
+
+        if (data.length === 0) {
+          const colspan = includeActions ? 8 : 7;
+          tbody.innerHTML = `<tr><td colspan="${colspan}">Sin incidencias</td></tr>`;
+        }
+      } catch (e) {
+        msg.textContent = 'Error: ' + (e.payload?.error ?? e.message ?? 'desconocido');
+      }
+    }
+
+    // Mostrar/ocultar paneles admin según rol
+    function toggleAdminPanels(rol) {
+      const show = (rol === 'admin');
+      document.getElementById('admin_equipo').classList.toggle('hidden', !show);
+      document.getElementById('admin_programacion').classList.toggle('hidden', !show);
+      document.getElementById('admin_mantenimiento').classList.toggle('hidden', !show);
+      document.getElementById('admin_incidencia').classList.toggle('hidden', !show);
+    }
+
+    // Combos para paneles admin (laboratorios / equipos / filtros)
     async function cargarCombosAdmin() {
       // Laboratorios para crear equipo
       const labs = await fetchJSON('/laboratorios');
@@ -553,6 +934,22 @@
       const progEquipo = document.getElementById('prog_equipo');
       progEquipo.innerHTML = '<option value="">Seleccione</option>' +
         (Array.isArray(equipos) ? equipos.map(e => `<option value="${e.id}">${e.etiqueta_activo} (${e.laboratorio})</option>`).join('') : '');
+
+      // Equipos para crear mantenimiento/incidencia
+      const mantEqSel = document.getElementById('mant_equipo_create');
+      const incEqSel  = document.getElementById('inc_equipo_create');
+      if (mantEqSel) mantEqSel.innerHTML = '<option value="">Seleccione</option>' +
+        (Array.isArray(equipos) ? equipos.map(e => `<option value="${e.id}">${e.etiqueta_activo} (${e.laboratorio})</option>`).join('') : '');
+      if (incEqSel) incEqSel.innerHTML = '<option value="">Seleccione</option>' +
+        (Array.isArray(equipos) ? equipos.map(e => `<option value="${e.id}">${e.etiqueta_activo} (${e.laboratorio})</option>`).join('') : '');
+
+      // Equipos en filtros de mantenimientos e incidencias
+      const mantEqFilter = document.getElementById('mant_equipo');
+      const incEqFilter  = document.getElementById('inc_equipo');
+      if (mantEqFilter) mantEqFilter.innerHTML = '<option value="">Todos</option>' +
+        (Array.isArray(equipos) ? equipos.map(e => `<option value="${e.id}">${e.etiqueta_activo}</option>`).join('') : '');
+      if (incEqFilter) incEqFilter.innerHTML = '<option value="">Todos</option>' +
+        (Array.isArray(equipos) ? equipos.map(e => `<option value="${e.id}">${e.etiqueta_activo}</option>`).join('') : '');
     }
 
     // Bind de eventos (una sola vez)
@@ -637,50 +1034,98 @@
             body: JSON.stringify(payload)
           });
           msg.textContent = 'Creada (ID ' + r.id + ')';
-          await cargarProximas(); // con candado, no se duplica
-        } catch (e2) {
-          msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
-        }
-      });
-
-      // ---- ELIMINAR PROGRAMACIÓN (btn-del-prog) ----
-      document.addEventListener('click', async (ev) => {
-        const btn = ev.target.closest('.btn-del-prog');
-        if (!btn) return;
-        const id = btn.getAttribute('data-id');
-        if (!id) return;
-        if (!confirm('¿Eliminar programación ID ' + id + '?')) return;
-
-        const msg = document.getElementById('prox_msg');
-        msg.textContent = 'Eliminando...';
-        try {
-          await fetchJSON('/programaciones/' + id, { method: 'DELETE' });
-          msg.textContent = 'Programación eliminada';
           await cargarProximas();
         } catch (e2) {
           msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
         }
       });
 
-      // ---- ELIMINAR EQUIPO (btn-del-eq) ----
-      document.addEventListener('click', async (ev) => {
-        const btnDelEq = ev.target.closest('.btn-del-eq');
-        if (!btnDelEq) return;
-        const id = btnDelEq.getAttribute('data-id');
-        if (!id) return;
-        if (!confirm('¿Eliminar equipo ID ' + id + '?')) return;
+      // Crear mantenimiento
+      document.getElementById('formMantCreate')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById('mant_create_msg');
+        msg.textContent = 'Creando...';
 
-        const msg = document.getElementById('eq_msg');
-        msg.textContent = 'Eliminando...';
-        try {
-          await fetchJSON('/equipos/' + id, { method: 'DELETE' });
-          msg.textContent = 'Equipo eliminado';
-          await cargarEquipos();
-          await cargarCombosAdmin();
-        } catch (e) {
-          // Si hay referencias, el backend devolverá 409 con un mensaje sugerido
-          msg.textContent = 'Error: ' + (e.payload?.error ?? e.message ?? 'desconocido');
+        const payload = {
+          equipo_id: parseInt(document.getElementById('mant_equipo_create').value),
+          tipo: document.getElementById('mant_tipo_create').value,
+          fecha_apertura: toMySQLDateTime(document.getElementById('mant_apertura_create').value),
+          fecha_cierre:  toMySQLDateTime(document.getElementById('mant_cierre_create').value) || null,
+          estado: document.getElementById('mant_estado_create').value,
+          descripcion: document.getElementById('mant_desc_create').value || null
+        };
+        if (!payload.equipo_id || !payload.tipo || !payload.fecha_apertura) {
+          msg.textContent = 'Faltan campos obligatorios'; return;
         }
+
+        try {
+          const r = await fetchJSON('/mantenimientos', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+          });
+          msg.textContent = 'Creado (ID ' + r.id + ')';
+          await cargarMantenimientos();
+        } catch (e2) {
+          msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
+        }
+      });
+
+      // Crear incidencia (intenta tomar reportada_por de /me)
+      document.getElementById('formIncCreate')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById('inc_create_msg');
+        msg.textContent = 'Creando...';
+
+        let reportada_por_id = null;
+        try {
+          const info = await fetchJSON('/me');
+          reportada_por_id = info?.usuario?.id || null;
+        } catch {}
+
+        const payload = {
+          equipo_id: parseInt(document.getElementById('inc_equipo_create').value),
+          fecha_reporte: toMySQLDateTime(document.getElementById('inc_fecha_create').value),
+          severidad: document.getElementById('inc_severidad_create').value,
+          descripcion: document.getElementById('inc_desc_create').value || null,
+          mantenimiento_id: parseInt(document.getElementById('inc_mant_id_create').value) || null,
+          reportada_por: reportada_por_id
+        };
+        if (!payload.equipo_id || !payload.fecha_reporte || !payload.severidad) {
+          msg.textContent = 'Faltan campos obligatorios'; return;
+        }
+
+        try {
+          const r = await fetchJSON('/incidencias', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+          });
+          msg.textContent = 'Creada (ID ' + r.id + ')';
+          await cargarIncidencias();
+        } catch (e2) {
+          msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
+        }
+      });
+
+      // Filtros: mantenimientos
+      document.getElementById('mant_aplicar').addEventListener('click', cargarMantenimientos);
+      document.getElementById('mant_limpiar').addEventListener('click', async () => {
+        document.getElementById('mant_equipo').value = '';
+        document.getElementById('mant_estado').value = '';
+        document.getElementById('mant_tipo').value = '';
+        document.getElementById('mant_desde').value = '';
+        document.getElementById('mant_hasta').value = '';
+        await cargarMantenimientos();
+      });
+
+      // Filtros: incidencias
+      document.getElementById('inc_aplicar').addEventListener('click', cargarIncidencias);
+      document.getElementById('inc_limpiar').addEventListener('click', async () => {
+        document.getElementById('inc_equipo').value = '';
+        document.getElementById('inc_severidad').value = '';
+        document.getElementById('inc_mant_id').value = '';
+        document.getElementById('inc_desde').value = '';
+        document.getElementById('inc_hasta').value = '';
+        await cargarIncidencias();
       });
 
       // Logout
@@ -688,209 +1133,315 @@
         try { await fetchJSON('/logout', { method: 'POST' }); } catch {}
         window.location.href = '/login-ui';
       });
-    }
 
-    // Helpers para modal (editar programación/equipo)
-    function openModal(title, bodyHTML, onSave) {
-      const overlay = document.getElementById('modalOverlay');
-      const titleEl = document.getElementById('modalTitle');
-      const bodyEl  = document.getElementById('modalBody');
-      const msgEl   = document.getElementById('modalMsg');
-      titleEl.textContent = title;
-      bodyEl.innerHTML = bodyHTML;
-      msgEl.textContent = '';
-      overlay.classList.add('show');
+      // Delegación global: editar/eliminar programaciones, mantenimientos, incidencias y equipos
+      document.addEventListener('click', async (ev) => {
+        // EDITAR programación
+        const btnEditProg = ev.target.closest('.btn-edit-prog');
+        if (btnEditProg) {
+          const id = btnEditProg.getAttribute('data-id');
+          const periodicidad = btnEditProg.getAttribute('data-periodicidad') || '';
+          const fechaProxima = btnEditProg.getAttribute('data-fecha-proxima') || '';
+          const fechaUltima  = btnEditProg.getAttribute('data-fecha-ultima') || '';
 
-      const saveBtn = document.getElementById('modalSave');
-      const cancelBtn = document.getElementById('modalCancel');
+          const bodyHTML = `
+            <div class="grid">
+              <div>
+                <label>Periodicidad (días)</label>
+                <input id="edit_periodicidad" type="number" min="1" max="365" value="${periodicidad}" />
+              </div>
+              <div>
+                <label>Fecha próxima</label>
+                <input id="edit_fecha_proxima" type="date" value="${fechaProxima}" />
+              </div>
+              <div style="grid-column: span 2;">
+                <label>Fecha última (opcional)</label>
+                <input id="edit_fecha_ultima" type="date" value="${fechaUltima}" />
+              </div>
+            </div>
+          `;
+          openModal('Editar programación #' + id, bodyHTML, async (msg) => {
+            const payload = {
+              periodicidad_dias: parseInt(document.getElementById('edit_periodicidad').value),
+              fecha_proxima: document.getElementById('edit_fecha_proxima').value || null,
+              fecha_ultima:  document.getElementById('edit_fecha_ultima').value || null
+            };
+            if (!payload.periodicidad_dias || !payload.fecha_proxima) {
+              throw new Error('Faltan campos obligatorios');
+            }
+            await fetchJSON('/programaciones/' + id, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            await cargarProximas();
+          });
+          return;
+        }
 
-      const cleanup = () => {
-        overlay.classList.remove('show');
-        // resetear handlers
-        const newSave = saveBtn.cloneNode(true);
-        const newCancel = cancelBtn.cloneNode(true);
-        saveBtn.parentNode.replaceChild(newSave, saveBtn);
-        cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
-      };
+        // ELIMINAR programación
+        const btnDelProg = ev.target.closest('.btn-del-prog');
+        if (btnDelProg) {
+          const id = btnDelProg.getAttribute('data-id');
+          if (!id) return;
+          if (!confirm('¿Eliminar programación ID ' + id + '?')) return;
+          const msg = document.getElementById('prox_msg');
+          msg.textContent = 'Eliminando...';
+          try {
+            await fetchJSON('/programaciones/' + id, { method: 'DELETE' });
+            msg.textContent = 'Programación eliminada';
+            await cargarProximas();
+          } catch (e2) {
+            msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
+          }
+          return;
+        }
 
-      document.getElementById('modalCancel').addEventListener('click', cleanup);
-      document.getElementById('modalSave').addEventListener('click', async () => {
-        try {
-          await onSave(msgEl);
-          cleanup();
-        } catch (e) {
-          msgEl.textContent = 'Error: ' + (e.payload?.error ?? e.message ?? 'desconocido');
+        // EDITAR mantenimiento
+        const btnEditMant = ev.target.closest('.btn-edit-mant');
+        if (btnEditMant) {
+          const id = btnEditMant.getAttribute('data-id');
+          const tipo = btnEditMant.getAttribute('data-tipo') || 'preventivo';
+          const estado = btnEditMant.getAttribute('data-estado') || 'abierto';
+          const apertura = (btnEditMant.getAttribute('data-apertura') || '').replace(' ', 'T').slice(0,16);
+          const cierre   = (btnEditMant.getAttribute('data-cierre') || '').replace(' ', 'T').slice(0,16);
+          const desc     = btnEditMant.getAttribute('data-desc') || '';
+
+          const bodyHTML = `
+            <div class="grid">
+              <div>
+                <label>Tipo</label>
+                <select id="edit_mant_tipo">
+                  <option ${tipo==='preventivo'?'selected':''}>preventivo</option>
+                  <option ${tipo==='correctivo'?'selected':''}>correctivo</option>
+                </select>
+              </div>
+              <div>
+                <label>Estado</label>
+                <select id="edit_mant_estado">
+                  <option ${estado==='abierto'?'selected':''}>abierto</option>
+                  <option ${estado==='en_proceso'?'selected':''}>en_proceso</option>
+                  <option ${estado==='cerrado'?'selected':''}>cerrado</option>
+                </select>
+              </div>
+              <div>
+                <label>Apertura</label>
+                <input id="edit_mant_apertura" type="datetime-local" value="${apertura}" />
+              </div>
+              <div>
+                <label>Cierre (opcional)</label>
+                <input id="edit_mant_cierre" type="datetime-local" value="${cierre}" />
+              </div>
+              <div style="grid-column: span 2;">
+                <label>Descripción</label>
+                <input id="edit_mant_desc" value="${desc}" />
+              </div>
+            </div>
+          `;
+          openModal('Editar mantenimiento #' + id, bodyHTML, async (msg) => {
+            const payload = {
+              tipo: document.getElementById('edit_mant_tipo').value,
+              estado: document.getElementById('edit_mant_estado').value,
+              fecha_apertura: toMySQLDateTime(document.getElementById('edit_mant_apertura').value),
+              fecha_cierre: toMySQLDateTime(document.getElementById('edit_mant_cierre').value) || null,
+              descripcion: document.getElementById('edit_mant_desc').value || null
+            };
+            if (!payload.tipo || !payload.fecha_apertura) throw new Error('Faltan campos obligatorios');
+            await fetchJSON('/mantenimientos/' + id, {
+              method: 'PUT', headers: {'Content-Type':'application/json'},
+              body: JSON.stringify(payload)
+            });
+            await cargarMantenimientos();
+          });
+          return;
+        }
+
+        // ELIMINAR mantenimiento
+        const btnDelMant = ev.target.closest('.btn-del-mant');
+        if (btnDelMant) {
+          const id = btnDelMant.getAttribute('data-id');
+          if (!id) return;
+          if (!confirm('¿Eliminar mantenimiento ID ' + id + '?')) return;
+          const msg = document.getElementById('mant_msg');
+          msg.textContent = 'Eliminando...';
+          try {
+            await fetchJSON('/mantenimientos/' + id, { method: 'DELETE' });
+            msg.textContent = 'Mantenimiento eliminado';
+            await cargarMantenimientos();
+          } catch (e2) {
+            msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
+          }
+          return;
+        }
+
+        // EDITAR incidencia
+        const btnEditInc = ev.target.closest('.btn-edit-inc');
+        if (btnEditInc) {
+          const id = btnEditInc.getAttribute('data-id');
+          const sev = btnEditInc.getAttribute('data-sev') || 'media';
+          const fecha = btnEditInc.getAttribute('data-fecha') || '';
+          const desc  = btnEditInc.getAttribute('data-desc') || '';
+          const mant  = btnEditInc.getAttribute('data-mant') || '';
+
+          const bodyHTML = `
+            <div class="grid">
+              <div>
+                <label>Severidad</label>
+                <select id="edit_inc_sev">
+                  <option ${sev==='baja'?'selected':''}>baja</option>
+                  <option ${sev==='media'?'selected':''}>media</option>
+                  <option ${sev==='alta'?'selected':''}>alta</option>
+                </select>
+              </div>
+              <div>
+                <label>Fecha reporte</label>
+                <input id="edit_inc_fecha" type="datetime-local" value="${fecha}" />
+              </div>
+              <div style="grid-column: span 2;">
+                <label>Descripción</label>
+                <input id="edit_inc_desc" value="${desc}" />
+              </div>
+              <div>
+                <label>Mantenimiento (ID)</label>
+                <input id="edit_inc_mant" type="number" min="1" value="${mant}" />
+              </div>
+            </div>
+          `;
+          openModal('Editar incidencia #' + id, bodyHTML, async (msg) => {
+            const payload = {
+              severidad: document.getElementById('edit_inc_sev').value,
+              fecha_reporte: toMySQLDateTime(document.getElementById('edit_inc_fecha').value),
+              descripcion: document.getElementById('edit_inc_desc').value || null,
+              mantenimiento_id: parseInt(document.getElementById('edit_inc_mant').value) || null
+            };
+            if (!payload.severidad || !payload.fecha_reporte) throw new Error('Faltan campos obligatorios');
+            await fetchJSON('/incidencias/' + id, {
+              method: 'PUT', headers: {'Content-Type':'application/json'},
+              body: JSON.stringify(payload)
+            });
+            await cargarIncidencias();
+          });
+          return;
+        }
+
+        // ELIMINAR incidencia
+        const btnDelInc = ev.target.closest('.btn-del-inc');
+        if (btnDelInc) {
+          const id = btnDelInc.getAttribute('data-id');
+          if (!id) return;
+          if (!confirm('¿Eliminar incidencia ID ' + id + '?')) return;
+          const msg = document.getElementById('inc_msg');
+          msg.textContent = 'Eliminando...';
+          try {
+            await fetchJSON('/incidencias/' + id, { method: 'DELETE' });
+            msg.textContent = 'Incidencia eliminada';
+            await cargarIncidencias();
+          } catch (e2) {
+            msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
+          }
+          return;
+        }
+
+        // EDITAR equipo
+        const btnEditEq = ev.target.closest('.btn-edit-eq');
+        if (btnEditEq) {
+          const id = btnEditEq.getAttribute('data-id');
+          const tr = btnEditEq.closest('tr');
+          const etiqueta = tr.children[1].textContent.trim();
+          const tipo     = tr.children[2].textContent.trim();
+          const marca    = tr.children[3].textContent.trim();
+          const modelo   = tr.children[4].textContent.trim();
+          const estado   = tr.children[5].textContent.trim();
+          const laboratorioIdActual = btnEditEq.getAttribute('data-labid') || '';
+
+          const bodyHTML = `
+            <div class="grid">
+              <div>
+                <label>Etiqueta (única)</label>
+                <input id="edit_etiqueta" value="${etiqueta}" />
+              </div>
+              <div>
+                <label>Laboratorio</label>
+                <select id="edit_lab"></select>
+              </div>
+              <div>
+                <label>Tipo</label>
+                <input id="edit_tipo" value="${tipo}" />
+              </div>
+              <div>
+                <label>Marca</label>
+                <input id="edit_marca" value="${marca}" />
+              </div>
+              <div>
+                <label>Modelo</label>
+                <input id="edit_modelo" value="${modelo}" />
+              </div>
+              <div>
+                <label>Estado</label>
+                <select id="edit_estado">
+                  <option ${estado==='operativo'?'selected':''}>operativo</option>
+                  <option ${estado==='programado'?'selected':''}>programado</option>
+                  <option ${estado==='en_mantenimiento'?'selected':''}>en_mantenimiento</option>
+                  <option ${estado==='de_baja'?'selected':''}>de_baja</option>
+                </select>
+              </div>
+            </div>
+          `;
+          openModal('Editar equipo #' + id, bodyHTML, async (msg) => {
+            const etiqueta = document.getElementById('edit_etiqueta').value.trim();
+            const labId    = parseInt(document.getElementById('edit_lab').value);
+            const payload = {
+              etiqueta_activo: etiqueta,
+              laboratorio_id: labId,
+              tipo:  document.getElementById('edit_tipo').value.trim() || null,
+              marca: document.getElementById('edit_marca').value.trim() || null,
+              modelo:document.getElementById('edit_modelo').value.trim() || null,
+              estado:document.getElementById('edit_estado').value
+            };
+            if (!payload.etiqueta_activo || !payload.laboratorio_id) {
+              throw new Error('Faltan campos obligatorios');
+            }
+
+            await fetchJSON('/equipos/' + id, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            await cargarEquipos();
+            await cargarCombosAdmin();
+          });
+
+          // Cargar labs en el select del modal y seleccionar el actual por ID
+          (async () => {
+            const labs = await fetchJSON('/laboratorios');
+            const sel = document.getElementById('edit_lab');
+            sel.innerHTML = labs.map(l => `<option value="${l.id}">${l.nombre}</option>`).join('');
+            if (laboratorioIdActual) sel.value = laboratorioIdActual;
+          })();
+          return;
+        }
+
+        // ELIMINAR equipo
+        const btnDelEq = ev.target.closest('.btn-del-eq');
+        if (btnDelEq) {
+          const id = btnDelEq.getAttribute('data-id');
+          if (!id) return;
+          if (!confirm('¿Eliminar equipo ID ' + id + '?')) return;
+
+          const msg = document.getElementById('eq_msg');
+          msg.textContent = 'Eliminando...';
+          try {
+            await fetchJSON('/equipos/' + id, { method: 'DELETE' });
+            msg.textContent = 'Equipo eliminado';
+            await cargarEquipos();
+            await cargarCombosAdmin();
+          } catch (e) {
+            msg.textContent = 'Error: ' + (e.payload?.error ?? e.message ?? 'desconocido');
+          }
+          return;
         }
       });
     }
-
-    // ---- EDITAR PROGRAMACIÓN (btn-edit-prog) ----
-    document.addEventListener('click', (ev) => {
-      const btnEditProg = ev.target.closest('.btn-edit-prog');
-      if (!btnEditProg) return;
-
-      const id = btnEditProg.getAttribute('data-id');
-      const periodicidad = btnEditProg.getAttribute('data-periodicidad') || '';
-      const fechaProxima = btnEditProg.getAttribute('data-fecha-proxima') || '';
-      const fechaUltima  = btnEditProg.getAttribute('data-fecha-ultima') || '';
-
-      const bodyHTML = `
-        <div class="grid">
-          <div>
-            <label>Periodicidad (días)</label>
-            <input id="edit_periodicidad" type="number" min="1" max="365" value="${periodicidad}" />
-          </div>
-          <div>
-            <label>Fecha próxima</label>
-            <input id="edit_fecha_proxima" type="date" value="${fechaProxima}" />
-          </div>
-          <div style="grid-column: span 2;">
-            <label>Fecha última (opcional)</label>
-            <input id="edit_fecha_ultima" type="date" value="${fechaUltima}" />
-          </div>
-        </div>
-      `;
-
-      openModal('Editar programación #' + id, bodyHTML, async (msg) => {
-        const payload = {
-          periodicidad_dias: parseInt(document.getElementById('edit_periodicidad').value),
-          fecha_proxima: document.getElementById('edit_fecha_proxima').value || null,
-          fecha_ultima:  document.getElementById('edit_fecha_ultima').value || null
-        };
-        if (!payload.periodicidad_dias || !payload.fecha_proxima) {
-          throw new Error('Faltan campos obligatorios');
-        }
-        await fetchJSON('/programaciones/' + id, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        await cargarProximas();
-      });
-    });
-
-    // ---- EDITAR EQUIPO (btn-edit-eq) ----
-    document.addEventListener('click', (ev) => {
-      const btnEditEq = ev.target.closest('.btn-edit-eq');
-      if (!btnEditEq) return;
-      const id = btnEditEq.getAttribute('data-id');
-
-      // Obtenemos la fila para leer valores actuales
-      const tr = btnEditEq.closest('tr');
-      const etiqueta = tr.children[1].textContent.trim();
-      const tipo     = tr.children[2].textContent.trim();
-      const marca    = tr.children[3].textContent.trim();
-      const modelo   = tr.children[4].textContent.trim();
-      const estado   = tr.children[5].textContent.trim();
-      const laboratorioNombre = tr.children[6].textContent.trim();
-
-      const bodyHTML = `
-        <div class="grid">
-          <div>
-            <label>Etiqueta (única)</label>
-            <input id="edit_etiqueta" value="${etiqueta}" />
-          </div>
-          <div>
-            <label>Laboratorio</label>
-            <select id="edit_lab"></select>
-          </div>
-          <div>
-            <label>Tipo</label>
-            <input id="edit_tipo" value="${tipo}" />
-          </div>
-          <div>
-            <label>Marca</label>
-            <input id="edit_marca" value="${marca}" />
-          </div>
-          <div>
-            <label>Modelo</label>
-            <input id="edit_modelo" value="${modelo}" />
-          </div>
-          <div>
-            <label>Estado</label>
-            <select id="edit_estado">
-              <option ${estado==='operativo'?'selected':''}>operativo</option>
-              <option ${estado==='programado'?'selected':''}>programado</option>
-              <option ${estado==='en_mantenimiento'?'selected':''}>en_mantenimiento</option>
-              <option ${estado==='de_baja'?'selected':''}>de_baja</option>
-            </select>
-          </div>
-        </div>
-      `;
-
-      openModal('Editar equipo #' + id, bodyHTML, async (msg) => {
-        const etiqueta = document.getElementById('edit_etiqueta').value.trim();
-        const labId    = parseInt(document.getElementById('edit_lab').value);
-        const payload = {
-          etiqueta_activo: etiqueta,
-          laboratorio_id: labId,
-          tipo:  document.getElementById('edit_tipo').value.trim() || null,
-          marca: document.getElementById('edit_marca').value.trim() || null,
-          modelo:document.getElementById('edit_modelo').value.trim() || null,
-          estado:document.getElementById('edit_estado').value
-        };
-        if (!payload.etiqueta_activo || !payload.laboratorio_id) {
-          throw new Error('Faltan campos obligatorios');
-        }
-
-        await fetchJSON('/equipos/' + id, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        await cargarEquipos();
-        await cargarCombosAdmin(); // refrescar combos si estás en admin
-      });
-
-      // Cargar labs en el select del modal y seleccionar el actual
-      (async () => {
-        const labs = await fetchJSON('/laboratorios');
-        const sel = document.getElementById('edit_lab');
-        sel.innerHTML = labs.map(l => `<option value="${l.id}">${l.nombre}</option>`).join('');
-        // Selecciona el laboratorio actual de la fila (por nombre)
-        const current = labs.find(l => l.nombre === laboratorioNombre);
-        if (current) sel.value = current.id;
-      })();
-    });
-
-    // ---- ELIMINAR PROGRAMACIÓN (delegación global) ----
-    document.addEventListener('click', async (ev) => {
-      const btn = ev.target.closest('.btn-del-prog');
-      if (!btn) return;
-      const id = btn.getAttribute('data-id');
-      if (!id) return;
-      if (!confirm('¿Eliminar programación ID ' + id + '?')) return;
-
-      const msg = document.getElementById('prox_msg');
-      msg.textContent = 'Eliminando...';
-      try {
-        await fetchJSON('/programaciones/' + id, { method: 'DELETE' });
-        msg.textContent = 'Programación eliminada';
-        await cargarProximas();
-      } catch (e2) {
-        msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
-      }
-    });
-
-    // ---- ELIMINAR EQUIPO (delegación global) ----
-    document.addEventListener('click', async (ev) => {
-      const btnDelEq = ev.target.closest('.btn-del-eq');
-      if (!btnDelEq) return;
-      const id = btnDelEq.getAttribute('data-id');
-      if (!id) return;
-      if (!confirm('¿Eliminar equipo ID ' + id + '?')) return;
-
-      const msg = document.getElementById('eq_msg');
-      msg.textContent = 'Eliminando...';
-      try {
-        await fetchJSON('/equipos/' + id, { method: 'DELETE' });
-        msg.textContent = 'Equipo eliminado';
-        await cargarEquipos();
-        await cargarCombosAdmin();
-      } catch (e) {
-        msg.textContent = 'Error: ' + (e.payload?.error ?? e.message ?? 'desconocido');
-      }
-    });
 
     // Inicialización
     async function init() {
@@ -904,8 +1455,13 @@
         // Cargar catálogos y datos
         await cargarLaboratorios('eq_lab');
         await cargarEquipos();
+
         await cargarLaboratorios('prox_lab');
         await cargarProximas();
+
+        // Paneles Mantenimientos / Incidencias
+        await cargarMantenimientos();
+        await cargarIncidencias();
 
         // Rol: mostrar/ocultar paneles admin y cargar combos
         toggleAdminPanels(ROL);
@@ -922,94 +1478,6 @@
       }
     }
     init();
-
-    // Bind global de eventos (definido arriba)
-    function bindEventsOnce() {
-      if (eventsBound) return;
-      eventsBound = true;
-
-      // Equipos: aplicar / limpiar
-      document.getElementById('eq_aplicar').addEventListener('click', cargarEquipos);
-      document.getElementById('eq_limpiar').addEventListener('click', async () => {
-        document.getElementById('eq_lab').value = '';
-        document.getElementById('eq_estado').value = '';
-        document.getElementById('eq_tipo').value = '';
-        document.getElementById('eq_marca').value = '';
-        await cargarEquipos();
-      });
-
-      // Proximas: aplicar / limpiar
-      document.getElementById('prox_aplicar').addEventListener('click', cargarProximas);
-      document.getElementById('prox_limpiar').addEventListener('click', async () => {
-        document.getElementById('prox_lab').value = '';
-        document.getElementById('prox_hasta').value = 60;
-        document.getElementById('prox_tipo').value = '';
-        document.getElementById('prox_marca').value = '';
-        await cargarProximas();
-      });
-
-      // Crear equipo
-      document.getElementById('formEquipo').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const msg = document.getElementById('msgEquipo');
-        msg.textContent = 'Creando...';
-
-        const payload = {
-          etiqueta_activo: document.getElementById('eq_etiqueta').value.trim(),
-          laboratorio_id: parseInt(document.getElementById('eq_lab_create').value),
-          tipo:  document.getElementById('eq_tipo_create').value.trim() || null,
-          marca: document.getElementById('eq_marca_create').value.trim() || null,
-          modelo: document.getElementById('eq_modelo_create').value.trim() || null,
-          estado: document.getElementById('eq_estado_create').value
-        };
-        if (!payload.etiqueta_activo || !payload.laboratorio_id) {
-          msg.textContent = 'Faltan campos obligatorios';
-          return;
-        }
-
-        try {
-          const r = await fetchJSON('/equipos', {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(payload)
-          });
-          msg.textContent = 'Creado (ID ' + r.id + ')';
-          await cargarEquipos();
-          await cargarCombosAdmin();
-        } catch (e2) {
-          msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
-        }
-      });
-
-      // Crear programación
-      document.getElementById('formProgramacion').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const msg = document.getElementById('msgProgramacion');
-        msg.textContent = 'Creando...';
-
-        const payload = {
-          equipo_id: parseInt(document.getElementById('prog_equipo').value),
-          periodicidad_dias: parseInt(document.getElementById('prog_periodicidad').value),
-          fecha_proxima: document.getElementById('prog_fecha_proxima').value || null,
-          fecha_ultima:  document.getElementById('prog_fecha_ultima').value || null
-        };
-        if (!payload.equipo_id || !payload.periodicidad_dias || !payload.fecha_proxima) {
-          msg.textContent = 'Faltan campos obligatorios';
-          return;
-        }
-
-        try {
-          const r = await fetchJSON('/programaciones', {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(payload)
-          });
-          msg.textContent = 'Creada (ID ' + r.id + ')';
-          await cargarProximas();
-        } catch (e2) {
-          msg.text          msg.textContent = 'Error: ' + (e2.payload?.error ?? e2.message ?? 'desconocido');
-        }
-      });
-    }
   </script>
 </body>
+</html>
